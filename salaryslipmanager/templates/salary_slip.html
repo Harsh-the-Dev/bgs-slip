@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salary Slip</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 2px solid #000;
+            width: 600px;
+        }
+        .header {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-weight: bold;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+        .content-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .content-table th, .content-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            text-align: left;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 12px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">EINFRATECH SYSTEMS<br>PAYSLIP FOR THE MONTH OF {{ month }}</div>
+    
+    <div class="section">
+        <div class="section-title">Employee Pay Summary</div>
+        <p>Employee Name: {{ employee_name }}</p>
+        <p>Employee Code: {{ employee_code }}</p>
+        <p>Designation: {{ designation }}</p>
+        <p>Date of Joining: {{ date_of_joining }}</p>
+        <p>Paid Days: {{ paid_days }} Total Days: {{ total_days }} Non Paid Days: {{ non_paid_days }}</p>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Earnings & Deductions</div>
+        <table class="content-table">
+            <tr>
+                <th>Earnings</th>
+                <th>Amount</th>
+                <th>Deductions</th>
+                <th>Amount</th>
+            </tr>
+            <tr>
+                <td>Basic</td><td>{{ basic }}</td><td>Total Deductions</td><td>{{ total_deductions }}</td>
+            </tr>
+            <tr>
+                <td>House Rent Allowance</td><td>{{ hra }}</td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>Conveyance Allowance</td><td>{{ conveyance }}</td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>Other Allowance</td><td>{{ other_allowance }}</td><td></td><td></td>
+            </tr>
+            <tr>
+                <td>Welfare Allowance</td><td>{{ welfare }}</td><td></td><td></td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Reimbursements</div>
+        <table class="content-table">
+            <tr>
+                <th>Reimbursement</th>
+                <th>Amount</th>
+            </tr>
+            <tr>
+                <td>Internet</td><td>{{ internet }}</td>
+            </tr>
+            <tr>
+                <td>Traveling</td><td>{{ traveling }}</td>
+            </tr>
+        </table>
+    </div>
+    
+    <div class="section">
+        <div class="section-title">Total Net Payable</div>
+        <p>Total Net Payable = {{ total_net_payable }}</p>
+    </div>
+    
+    <div class="footer">*THIS SALARY SLIP IS COMPUTER GENERATED AND DOES NOT REQUIRE A STAMP*</div>
+</body>
+</html>
