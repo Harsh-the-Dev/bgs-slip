@@ -52,6 +52,13 @@ from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet
 
+import io
+from reportlab.lib.pagesizes import A4
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet
+from django.http import FileResponse
+
 def generate_salary_slip_pdf(data):
     """Generate a professional salary slip PDF in vertical (portrait) format"""
 
@@ -68,7 +75,7 @@ def generate_salary_slip_pdf(data):
 
     # ✅ Title & Header
     title = Paragraph("<b>Bridge Group Solutions</b>", styles['Title'])
-    subtitle = Paragraph(f"<b>PAYSLIP FOR  {data.get('month', 'Feburary 2025')}</b>", styles['Heading2'])
+    subtitle = Paragraph(f"<b>PAYSLIP FOR  {data.get('month', 'February 2025')}</b>", styles['Heading2'])
     header_table = Table([[title], [subtitle]], colWidths=[usable_width])
     header_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
@@ -76,13 +83,17 @@ def generate_salary_slip_pdf(data):
     ]))
 
     # ✅ Employee Pay Summary
+    total_days = data.get('total_days', 30)
+    paid_days = data.get('paid_days', 30)
+    non_paid_days = max(0, total_days - paid_days)  # Ensure non-paid days are not negative
+
     emp_details = [
-        ["Employee Name:", data["employee_name"]],
-        ["Employee Code:", data["employee_code"]],
-        ["Designation:", data["designation"]],
-        ["Date of Joining:", str(data["date_of_joining"])],
-        ["Paid Days:", f"{data['paid_days']} / {data['total_days']}"],
-        ["Non Paid Days:", data["non_paid_days"]],
+        ["Employee Name:", str(data.get("employee_name", ""))],
+        ["Employee Code:", str(data.get("employee_code", ""))],
+        ["Designation:", str(data.get("designation", ""))],
+        ["Date of Joining:", str(data.get("date_of_joining", ""))],
+        ["Paid Days:", f"{paid_days} / {total_days}"],
+        ["Non Paid Days:", str(non_paid_days)],
     ]
     emp_table = Table(emp_details, colWidths=[160, 355])
     emp_table.setStyle(TableStyle([
@@ -91,15 +102,15 @@ def generate_salary_slip_pdf(data):
         ('RIGHTPADDING', (0, 0), (-1, -1), 5),
     ]))
 
-    # ✅ Earnings Section (Single Column Layout)
+    # ✅ Earnings Section
     earnings_data = [
         ["Component", "Amount"],
-        ["Basic", f"{data['basic']}"],
-        ["HRA", f"{data['hra']}"],
-        ["Conveyance", f"{data['conveyance']}"],
-        ["Other Allowance", f"{data['other_allowance']}"],
-        ["Welfare", f"{data['welfare']}"],
-        ["Gross Earnings", f"{data['gross_earnings']}"],
+        ["Basic", f"{data.get('basic', '0.00')}"],
+        ["HRA", f"{data.get('hra', '0.00')}"],
+        ["Conveyance", f"{data.get('conveyance', '0.00')}"],
+        ["Other Allowance", f"{data.get('other_allowance', '0.00')}"],
+        ["Welfare", f"{data.get('welfare', '0.00')}"],
+        ["Gross Earnings", f"{data.get('gross_earnings', '0.00')}"],
     ]
     earnings_table = Table(earnings_data, colWidths=[250, 250])
     earnings_table.setStyle(TableStyle([
@@ -108,13 +119,13 @@ def generate_salary_slip_pdf(data):
         ('RIGHTPADDING', (0, 0), (-1, -1), 5),
     ]))
 
-    # ✅ Deductions Section (Below Earnings)
+    # ✅ Deductions Section
     deductions_data = [
         ["Component", "Amount"],
-        ["Tax", "0.00"],
-        ["PF", "0.00"],
-        ["Other Deductions", "0.00"],
-        ["Total Deductions", f"{data['total_deductions']}"],
+        ["Tax", f"{data.get('tax', '0.00')}"],
+        ["PF", f"{data.get('pf', '0.00')}"],
+        ["Other Deductions", f"{data.get('other_deductions', '0.00')}"],
+        ["Total Deductions", f"{data.get('total_deductions', '0.00')}"],
     ]
     deductions_table = Table(deductions_data, colWidths=[250, 250])
     deductions_table.setStyle(TableStyle([
@@ -126,9 +137,9 @@ def generate_salary_slip_pdf(data):
     # ✅ Reimbursements Section
     reimbursements_data = [
         ["Component", "Amount"],
-        ["Internet", f"{data['internet']}"],
-        ["Traveling", f"{data['traveling']}"],
-        ["Total Reimbursement", f"{data['total_reimbursement']}"],
+        ["Internet", f"{data.get('internet', '0.00')}"],
+        ["Traveling", f"{data.get('traveling', '0.00')}"],
+        ["Total Reimbursement", f"{data.get('total_reimbursement', '0.00')}"],
     ]
     reimbursements_table = Table(reimbursements_data, colWidths=[250, 250])
     reimbursements_table.setStyle(TableStyle([
@@ -139,8 +150,7 @@ def generate_salary_slip_pdf(data):
 
     # ✅ Total Net Payable Section
     net_salary = [
-        ["Total Net Payable:", f"{data['total_net_payable']}"],
-        # ["In Words:", f"{data['net_amount_words']}"],
+        ["Total Net Payable:", f"{data.get('total_net_payable', '0.00')}"],
     ]
     net_table = Table(net_salary, colWidths=[250, 250])
     net_table.setStyle(TableStyle([
@@ -183,3 +193,4 @@ def generate_salary_slip_pdf(data):
     doc.build(elements)
     buffer.seek(0)
     return FileResponse(buffer, as_attachment=True, filename="salary_slip.pdf")
+
