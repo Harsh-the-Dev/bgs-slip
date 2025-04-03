@@ -75,7 +75,7 @@ def generate_salary_slip_pdf(data):
 
     # ✅ Title & Header
     title = Paragraph("<b>Bridge Group Solutions</b>", styles['Title'])
-    subtitle = Paragraph(f"<b>PAYSLIP FOR  {data.get('month', 'February 2025')}</b>", styles['Heading2'])
+    subtitle = Paragraph(f"<b>PAYSLIP FOR  {data.get('month', 'March 2025')}</b>", styles['Heading2'])
     header_table = Table([[title], [subtitle]], colWidths=[usable_width])
     header_table.setStyle(TableStyle([
         ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
